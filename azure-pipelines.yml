@@ -1,0 +1,65 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+jobs:
+    job: Build
+steps:
+- task: NuGetToolInstaller@1
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'SonarQube'
+    scannerMode: 'MSBuild'
+    projectKey: 'E2E_PROJECT_E2E_PROJECT_AYociLq6MA-xZg_Cxn8h'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+
+    job: WaitingApproval
+    dependOn: Build
+    pool: server
+    timeoutInMinutes: 1000
+    steps:
+    - task: ManualValidation@0
+      inputs:
+        notifyUsers: 'veeravallikrishna293@gmail.com'
+        instructions: 'please check sonar-dashboard adn approve'
+
+    job: Deploy
+    dependOn: WaitingApproval
+    steps:
+    - task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'pay-as-you-go'
+    appType: 'webApp'
+    appName: 'angularfrontend and .net backend'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    deploymentMethod: 'auto'
+
+
