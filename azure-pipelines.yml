@@ -16,10 +16,12 @@ variables:
 jobs:
     job: Build
     steps:
+    settings
   - task: NuGetToolInstaller@1
   - task: NuGetCommand@2
     inputs:
       restoreSolution: '$(solution)'
+    settings
   - task: SonarQubePrepare@5
     inputs:
       SonarQube: 'SonarQube'
@@ -52,7 +54,7 @@ jobs:
       inputs:
         notifyUsers: 'veeravallikrishna293@gmail.com'
         instructions: 'please check sonar-dashboard adn approve'
-        
+
     job: Deploy
     dependOn: WaitingApproval
     steps:
