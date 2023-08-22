@@ -40,9 +40,8 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-
     job: WaitingApproval
-    dependOn: Build
+    dependsOn: Build
     pool: server
     timeoutInMinutes: 1000
     steps:
