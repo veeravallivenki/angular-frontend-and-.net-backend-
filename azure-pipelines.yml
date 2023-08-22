@@ -25,7 +25,6 @@ steps:
     SonarQube: 'SonarQube'
     scannerMode: 'MSBuild'
     projectKey: 'E2E_PROJECT_E2E_PROJECT_AYociLq6MA-xZg_Cxn8h'
-
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
@@ -43,7 +42,6 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
-
     job: WaitingApproval
     dependsOn: Build
     pool: server
@@ -53,7 +51,6 @@ steps:
       inputs:
         notifyUsers: 'veeravallikrishna293@gmail.com'
         instructions: 'please check sonar-dashboard adn approve'
-
     job: Deploy
     dependOn: WaitingApproval
     steps:
